@@ -1,0 +1,179 @@
+openapi: 3.1.0
+info:
+  title: Cloudy Account Service API
+  description: 基於 JWT 的使用者帳戶認證服務 API
+  version: 0.0.1
+  contact:
+    name: Cloudy Account Service
+  license:
+    name: "@TODO: 待指定授權條款"
+
+servers:
+  - url: http://localhost:8080
+    description: 本機開發環境
+  - url: "@TODO: 生產環境 URL"
+    description: 生產環境
+
+paths:
+  /login:
+    post:
+      summary: 使用者登入
+      description: 驗證使用者帳號密碼並回傳 JWT Token
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfoDto'
+            example:
+              userAccountID: "user123"
+              userPassword: "securePassword123"
+      responses:
+        '200':
+          description: 登入成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoRelayDto'
+              example:
+                token: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMTIzIiwiaWF0IjoxNjkwODc2ODAwLCJleHAiOjE2OTA4OTQ4MDB9.signature"
+        '401':
+          description: 認證失敗
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "INVALID_CREDENTIALS"
+                message: "帳號或密碼錯誤"
+        '500':
+          description: 伺服器內部錯誤
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /register:
+    post:
+      summary: 使用者註冊
+      description: 建立新的使用者帳戶
+      operationId: register
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfoDto'
+            example:
+              userAccountID: "newuser456"
+              userPassword: "strongPassword456"
+      responses:
+        '200':
+          description: 註冊成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountInfoPo'
+              example:
+                userAccound: "newuser456"
+                userPassword: "$2a$10$encrypted_password_hash"
+                createTime: "2023-07-01T10:00:00.000Z"
+                lastLogin: null
+        '400':
+          description: 請求參數錯誤
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 帳戶已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "ACCOUNT_EXISTS"
+                message: "該帳戶已存在"
+
+components:
+  schemas:
+    UserInfoDto:
+      type: object
+      required:
+        - userAccountID
+        - userPassword
+      properties:
+        userAccountID:
+          type: string
+          description: 使用者帳戶 ID
+          example: "user123"
+        userPassword:
+          type: string
+          format: password
+          description: 使用者密碼
+          example: "securePassword123"
+
+    UserInfoRelayDto:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: JWT 認證 Token
+          example: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMTIzIiwiaWF0IjoxNjkwODc2ODAwLCJleHAiOjE2OTA4OTQ4MDB9.signature"
+
+    AccountInfoPo:
+      type: object
+      properties:
+        userAccound:
+          type: string
+          description: 使用者帳戶 ID
+          example: "user123"
+        userPassword:
+          type: string
+          description: 加密後的使用者密碼
+          example: "$2a$10$encrypted_password_hash"
+        createTime:
+          type: string
+          format: date-time
+          description: 帳戶建立時間
+          example: "2023-07-01T10:00:00.000Z"
+        lastLogin:
+          type: string
+          format: date-time
+          nullable: true
+          description: 最後登入時間
+          example: "2023-07-01T10:00:00.000Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: 錯誤代碼
+        message:
+          type: string
+          description: 錯誤訊息
+        timestamp:
+          type: string
+          format: date-time
+          description: 錯誤發生時間
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Authentication
+    description: 使用者認證相關操作
