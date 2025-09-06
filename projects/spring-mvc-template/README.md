@@ -2,12 +2,110 @@
 
 現代化的 Spring Boot MVC 模板，集成最佳實踐和常用功能。
 
+## 🏗️ 軟體架構設計
+
+採用**分層架構設計模式**（Layered Architecture），遵循 Spring Boot 最佳實踐：
+
+```
+    ╔═══════════════════════════════════════════════════════════╗
+    ║     Infrastructure Layer (Cross-cutting Concerns)        ║
+    ║  ┌─────────────────────────────────────────────────────┐ ║
+    ║  │ AOP | Config | Exception | Security | Util | Cache  │ ║
+    ║  └─────────────────────────────────────────────────────┘ ║
+    ╚═══════════════╤═══════════════╤═══════════════╤═════════╝
+                    │               │               │
+    ┌───────────────▼───────────────▼───────────────▼───────────┐
+    │                   Presentation Layer                      │
+    │                   (Controller + DTO)                      │
+    ├────────────────────────────────────────────────────────────┤
+    │                    Business Layer                         │
+    │                     (Service)                             │
+    ├────────────────────────────────────────────────────────────┤
+    │                  Data Access Layer                        │
+    │                (Repository + Entity)                      │
+    └─────────────────────────┬──────────────────────────────────┘
+                              │
+    ┌─────────────────────────▼──────────────────────────────────┐
+    │                       Database                            │
+    └────────────────────────────────────────────────────────────┘
+    
+    ═══ 表示橫切所有層級（全層可用）
+    ─── 表示標準分層架構
+```
+
+### 各層職責詳解
+
+#### 🔧 **Infrastructure Layer（基礎設施層）- 橫切關注點**
+
+Infrastructure Layer 並非傳統意義上的"底層"，而是**橫切所有層級**的基礎設施支援：
+
+**📁 Config（配置類）**
+- **WebConfig**: Web MVC 配置（CORS、攔截器等）
+- **SecurityConfig**: Spring Security 安全配置
+- **OpenApiConfig**: Swagger/OpenAPI 文檔配置
+- **作用範圍**: 影響所有層級的行為
+
+**📁 Exception（異常處理）**
+- **GlobalExceptionHandler**: 全局異常處理器
+  - 統一捕獲所有層拋出的異常
+  - 返回標準錯誤格式
+- **BusinessException**: 業務異常
+- **ResourceNotFoundException**: 資源不存在異常
+- **作用範圍**: 處理來自任何層的異常
+
+**📁 Util（工具類）**
+- **ValidationUtil**: 驗證工具類
+- **作用範圍**: 可被任何層調用
+
+**📁 Mapper**
+- 使用 MapStruct 進行對象映射
+- Entity ↔ DTO 自動轉換
+- **作用範圍**: 主要用於層與層之間的數據轉換
+
+#### 1️⃣ **Presentation Layer（展示層）**
+
+**📁 Controller**
+- **職責**：處理 HTTP 請求、路由映射、參數驗證
+- **特點**：使用 `@RestController`、`@RequestMapping`
+- **規範**：RESTful API 設計、統一回應格式
+
+**📁 DTO (Data Transfer Object)**
+- **ApiResponse.java**: 統一 API 回應格式
+  - 包含 success、message、data、timestamp
+  - 提供靜態工廠方法簡化創建
+- **PageResponse.java**: 分頁回應格式
+  - 支援分頁資訊封裝
+
+#### 2️⃣ **Business Layer（業務層）**
+
+**📁 Service**
+- **職責**：業務邏輯處理、事務管理、緩存處理
+- **特點**：使用 `@Service`、`@Transactional`
+- **規範**：單一職責、介面導向設計
+
+#### 3️⃣ **Data Access Layer（數據訪問層）**
+
+**📁 Repository**
+- **職責**：數據持久化操作
+- **特點**：繼承 `JpaRepository`
+- **規範**：方法命名規約、自定義查詢
+
+**📁 Entity**
+- **BaseEntity.java**: 基礎實體類
+  - 自動管理 id、createdAt、updatedAt
+  - 支援樂觀鎖（version）
+  - 使用 JPA Auditing 自動填充時間戳
+
+
 ## 🚀 功能特色
+
+### 核心技術棧
 
 - ✅ **Spring Boot 3.2** - 最新穩定版本
 - ✅ **Java 21** - 最新 LTS 版本
 - ✅ **Spring Security 6** - 現代化安全框架
 - ✅ **Spring Data JPA** - 數據訪問層
+- ✅ **Spring AOP** - 面向切面編程
 - ✅ **Redis Cache** - 分布式緩存
 - ✅ **Swagger/OpenAPI 3** - API 文檔
 - ✅ **MapStruct** - 對象映射
@@ -17,11 +115,50 @@
 - ✅ **TestContainers** - 整合測試
 - ✅ **多環境配置** - dev/prod 環境隔離
 
+### 核心功能特性
+
+#### 🔐 **安全機制**
+- Spring Security 6 整合
+- JWT Token 認證支援
+- CORS 配置
+- XSS/CSRF 防護
+
+#### 🗄️ **數據管理**
+- Spring Data JPA 整合
+- 自動時間戳管理（創建/更新時間）
+- 樂觀鎖版本控制
+- 支援多種數據庫（H2/PostgreSQL/MySQL）
+
+#### ⚡ **性能優化**
+- Redis 緩存支援
+- HTTP/2 啟用
+- GZIP 壓縮
+- 連接池配置
+
+#### 📊 **監控與文檔**
+- Actuator 健康檢查
+- Prometheus 指標輸出
+- Swagger UI 自動生成
+- 結構化日誌記錄
+
+#### 🎯 **AOP 橫切關注點**
+- **日誌切面** - 自動記錄 API 請求/響應
+- **性能監控** - 追蹤方法執行時間
+- **審計日誌** - 記錄敏感操作
+- **自定義註解** - @TrackPerformance、@Auditable
+
 ## 📁 專案結構
 
 ```
 src/main/java/com/template/
 ├── Application.java              # 主應用程式類
+├── aspect/                      # AOP 切面
+│   ├── LoggingAspect.java     # 日誌切面
+│   ├── PerformanceAspect.java # 性能監控切面
+│   └── AuditAspect.java       # 審計切面
+├── annotation/                 # 自定義註解
+│   ├── TrackPerformance.java  # 性能追蹤註解
+│   └── Auditable.java         # 審計註解
 ├── config/                      # 配置類
 │   ├── WebConfig.java          # Web 配置
 │   ├── SecurityConfig.java     # 安全配置
@@ -70,6 +207,15 @@ java -jar target/spring-mvc-template-1.0.0-SNAPSHOT.jar
 - 健康檢查: http://localhost:8080/api/actuator/health
 
 ## 📝 使用說明
+
+### 🚀 快速創建新功能步驟
+
+1. **創建實體類** - 繼承 `BaseEntity`
+2. **創建 Repository** - 繼承 `JpaRepository`
+3. **創建 DTO** - 定義傳輸對象
+4. **創建 Mapper** - 使用 MapStruct
+5. **實現 Service** - 業務邏輯
+6. **創建 Controller** - RESTful API
 
 ### 創建新的 API
 
@@ -183,6 +329,49 @@ public class UserController {
 }
 ```
 
+### 💼 實際使用範例
+
+**創建產品管理功能：**
+
+```java
+// 1. Entity
+@Entity
+public class Product extends BaseEntity {
+    private String name;
+    private BigDecimal price;
+    private Integer stock;
+}
+
+// 2. Repository
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByPriceGreaterThan(BigDecimal price);
+}
+
+// 3. Service
+@Service
+@Transactional
+public class ProductService {
+    @Cacheable("products")
+    public ProductDto getProduct(Long id) {
+        return productRepository.findById(id)
+            .map(productMapper::toDto)
+            .orElseThrow(() -> new ResourceNotFoundException("Product", id));
+    }
+}
+
+// 4. Controller
+@RestController
+@RequestMapping("/products")
+public class ProductController {
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductDto>> getProduct(@PathVariable Long id) {
+        ProductDto product = productService.getProduct(id);
+        return ResponseEntity.ok(ApiResponse.success(product));
+    }
+}
+```
+
 ### 環境配置
 
 #### 開發環境 (application-dev.yml)
@@ -209,6 +398,63 @@ public class UserService {
     @CacheEvict(value = "users", key = "#id")
     public void deleteUser(Long id) {
         // 方法實現
+    }
+}
+```
+
+### AOP 使用範例
+
+#### 1. 性能監控
+
+```java
+@RestController
+@RequestMapping("/api/reports")
+public class ReportController {
+    
+    @GetMapping("/generate")
+    @TrackPerformance(warnThreshold = 5000, logArgs = true)
+    public ResponseEntity<ApiResponse<ReportDto>> generateReport(
+            @RequestParam String type) {
+        // 自動監控執行時間，超過 5 秒會警告
+        return reportService.generate(type);
+    }
+}
+```
+
+#### 2. 審計日誌
+
+```java
+@Service
+public class UserService {
+    
+    @Auditable(action = "DELETE_USER", resourceType = "User")
+    public void deleteUser(Long userId) {
+        // 自動記錄誰、何時、從哪裡刪除了用戶
+        userRepository.deleteById(userId);
+    }
+    
+    @Auditable(action = "UPDATE_ROLE", resourceType = "User", includeResult = true)
+    public UserDto updateUserRole(Long userId, String newRole) {
+        // 記錄角色變更的詳細信息
+        // ...
+    }
+}
+```
+
+#### 3. 全類性能追蹤
+
+```java
+@Service
+@TrackPerformance(warnThreshold = 2000)  // 類級別註解
+public class DataProcessingService {
+    // 此類中所有 public 方法都會被自動監控
+    
+    public void processData() {
+        // 自動追蹤
+    }
+    
+    public void analyzeResults() {
+        // 自動追蹤
     }
 }
 ```
@@ -338,12 +584,15 @@ spec:
 
 此專案採用 MIT 許可證 - 查看 [LICENSE](LICENSE) 文件了解詳情。
 
-## 💡 最佳實踐
+## 💡 最佳實踐建議
 
-1. **遵循 RESTful API 設計原則**
-2. **使用適當的 HTTP 狀態碼**
-3. **實施適當的異常處理**
-4. **編寫全面的測試用例**
-5. **使用緩存提升性能**
-6. **實施適當的日誌記錄**
-7. **遵循安全最佳實踐**
+1. **遵循分層架構** - 各層職責分明
+2. **使用統一異常處理** - 提供一致的錯誤回應
+3. **實施緩存策略** - 提升查詢性能
+4. **編寫完整測試** - 單元測試 + 整合測試
+5. **使用 DTO 模式** - 避免直接暴露實體
+6. **版本控制 API** - 支援向後兼容
+7. **記錄關鍵日誌** - 便於問題排查
+8. **遵循 RESTful API 設計原則**
+9. **使用適當的 HTTP 狀態碼**
+10. **遵循安全最佳實踐**
