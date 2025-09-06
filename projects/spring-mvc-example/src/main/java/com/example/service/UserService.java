@@ -1,14 +1,16 @@
 package com.example.service;
 
+import com.example.annotation.Auditable;
+import com.example.annotation.TrackPerformance;
 import com.example.dto.CreateUserRequest;
 import com.example.dto.UpdateUserRequest;
 import com.example.dto.UserDto;
 import com.example.entity.User;
 import com.example.mapper.UserMapper;
 import com.example.repository.UserRepository;
-import com.template.dto.PageResponse;
-import com.template.exception.BusinessException;
-import com.template.exception.ResourceNotFoundException;
+import com.example.dto.PageResponse;
+import com.example.exception.BusinessException;
+import com.example.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,6 +34,8 @@ public class UserService {
     private final UserMapper userMapper;
 
     @Transactional
+    @Auditable(action = "CREATE_USER", resourceType = "USER", includeArgs = true)
+    @TrackPerformance(warnThreshold = 500, logArgs = true)
     public UserDto createUser(CreateUserRequest request) {
         log.debug("Creating user with username: {}", request.getUsername());
 
@@ -94,6 +98,7 @@ public class UserService {
         return userMapper.toPageResponse(userPage);
     }
 
+    @TrackPerformance(warnThreshold = 800, logArgs = true)
     public PageResponse<UserDto> searchUsers(String username, String email, String firstName, 
                                            String lastName, User.UserStatus status, Pageable pageable) {
         log.debug("Searching users with criteria - username: {}, email: {}, firstName: {}, lastName: {}, status: {}", 
@@ -111,6 +116,7 @@ public class UserService {
         return userMapper.toPageResponse(userPage);
     }
 
+    @TrackPerformance(warnThreshold = 600, logArgs = true)
     public PageResponse<UserDto> searchUsers(String query, Pageable pageable) {
         log.debug("Searching users with query: {}", query);
         
@@ -120,6 +126,8 @@ public class UserService {
 
     @Transactional
     @CachePut(value = "users", key = "#id")
+    @Auditable(action = "UPDATE_USER", resourceType = "USER", includeArgs = true)
+    @TrackPerformance(warnThreshold = 300)
     public UserDto updateUser(Long id, UpdateUserRequest request) {
         log.debug("Updating user with ID: {}", id);
         
@@ -135,6 +143,8 @@ public class UserService {
 
     @Transactional
     @CacheEvict(value = "users", key = "#id")
+    @Auditable(action = "DELETE_USER", resourceType = "USER", includeArgs = true)
+    @TrackPerformance(warnThreshold = 200)
     public void deleteUser(Long id) {
         log.debug("Deleting user with ID: {}", id);
         
@@ -148,6 +158,8 @@ public class UserService {
 
     @Transactional
     @CachePut(value = "users", key = "#id")
+    @Auditable(action = "UPDATE_USER_STATUS", resourceType = "USER", includeArgs = true)
+    @TrackPerformance(warnThreshold = 200)
     public UserDto updateUserStatus(Long id, User.UserStatus status) {
         log.debug("Updating user status - ID: {}, status: {}", id, status);
         

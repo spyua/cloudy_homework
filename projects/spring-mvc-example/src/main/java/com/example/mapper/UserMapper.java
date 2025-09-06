@@ -18,9 +18,9 @@ public interface UserMapper {
 
     List<UserDto> toDtoList(List<User> users);
 
-    default com.template.dto.PageResponse<UserDto> toPageResponse(Page<User> userPage) {
+    default com.example.dto.PageResponse<UserDto> toPageResponse(Page<User> userPage) {
         List<UserDto> content = toDtoList(userPage.getContent());
-        return com.template.dto.PageResponse.<UserDto>builder()
+        return com.example.dto.PageResponse.<UserDto>builder()
                 .content(content)
                 .pageNumber(userPage.getNumber())
                 .pageSize(userPage.getSize())

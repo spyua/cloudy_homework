@@ -27,7 +27,7 @@ server:
 
 logging:
   level:
-    com.template: INFO
+    com.example: INFO
     org.springframework.security: WARN
   file:
     name: /var/log/app/application.log

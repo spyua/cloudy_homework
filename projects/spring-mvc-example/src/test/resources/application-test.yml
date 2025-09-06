@@ -24,5 +24,5 @@ spring:
   
 logging:
   level:
-    com.template: DEBUG
+    com.example: DEBUG
     org.springframework.test: DEBUG

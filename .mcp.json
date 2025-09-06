@@ -1,0 +1,30 @@
+{
+	"mcpServers": {
+		"serena": {
+			"type": "stdio",
+			"command": "uvx",
+			"args": [
+				"--from",
+				"git+https://github.com/oraios/serena",
+				"serena-mcp-server",
+				"--context",
+				"ide-assistant",
+				"--project",
+				"."
+			],
+			"env": {
+				"PROJECT_TYPE": "back-end-health-track",
+				"MEDICAL_SAFETY_MODE": "enabled"
+			}
+		},
+		"context7": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@upstash/context7-mcp@latest"
+			],
+			"env": {}
+		}
+	}
+}
