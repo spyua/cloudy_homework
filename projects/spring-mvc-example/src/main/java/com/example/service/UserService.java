@@ -1,18 +1,10 @@
 package com.example.service;
 
-import com.example.annotation.Auditable;
-import com.example.annotation.TrackPerformance;
-import com.example.dto.CreateUserRequest;
-import com.example.dto.UpdateUserRequest;
-import com.example.dto.UserDto;
-import com.example.entity.User;
-import com.example.mapper.UserMapper;
-import com.example.repository.UserRepository;
-import com.example.dto.PageResponse;
-import com.example.exception.BusinessException;
-import com.example.exception.ResourceNotFoundException;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,7 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
+import com.example.annotation.Auditable;
+import com.example.annotation.TrackPerformance;
+import com.example.dto.CreateUserRequest;
+import com.example.dto.PageResponse;
+import com.example.dto.UpdateUserRequest;
+import com.example.dto.UserDto;
+import com.example.entity.User;
+import com.example.exception.BusinessException;
+import com.example.exception.ResourceNotFoundException;
+import com.example.mapper.UserMapper;
+import com.example.repository.UserRepository;
 
 @Slf4j
 @Service
