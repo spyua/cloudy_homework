@@ -1,0 +1,19 @@
+{
+  "index": "首頁",
+  "tutorials": {
+    "title": "🎓 教學指南",
+    "type": "page"
+  },
+  "architecture": {
+    "title": "🏛️ 架構設計", 
+    "type": "page"
+  },
+  "examples": {
+    "title": "💼 範例展示",
+    "type": "page"
+  },
+  "guides": {
+    "title": "📖 開發指南",
+    "type": "page"
+  }
+}

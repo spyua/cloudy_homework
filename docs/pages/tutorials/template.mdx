@@ -1,0 +1,715 @@
+# 📚 Spring MVC Template 完整上手教學指南
+
+> **學習時間**: 約 2 小時 | **適合對象**: 企業級 Spring Boot 開發者
+
+## 🎯 教學目標
+
+本指南將幫助您：
+1. **理解模板架構** - 掌握企業級 Spring Boot 設計模式
+2. **快速創建新專案** - 基於模板建立您的業務應用
+3. **實現自定義功能** - 遵循最佳實踐添加業務邏輯
+4. **部署到生產環境** - 企業級部署配置
+
+## 🚀 階段一：模板探索 (20 分鐘)
+
+### 步驟 1：啟動並驗證模板
+
+```bash
+# 1. 克隆並進入專案目錄
+cd projects/spring-mvc-template
+
+# 2. 編譯驗證
+mvn clean compile
+
+# 3. 執行測試確保一切正常
+mvn test
+
+# 4. 啟動應用
+mvn spring-boot:run
+```
+
+### 步驟 2：探索核心功能
+
+**A. 驗證健康檢查**
+```bash
+curl http://localhost:8080/api/actuator/health
+```
+預期回應：`{"status":"UP"}`
+
+**B. 查看自動生成的 API 文檔**
+- 瀏覽器訪問：http://localhost:8080/api/swagger-ui.html
+- 這裡展示了所有可用的 API 端點規範
+
+**C. 查看資料庫控制台**
+- 訪問：http://localhost:8080/api/h2-console
+- JDBC URL: `jdbc:h2:mem:testdb`
+- 用戶名：`sa`，密碼：空
+
+**D. 監控指標查看**
+```bash
+# JVM 記憶體使用
+curl http://localhost:8080/api/actuator/metrics/jvm.memory.used
+
+# HTTP 請求統計
+curl http://localhost:8080/api/actuator/metrics/http.server.requests
+```
+
+### 步驟 3：理解 AOP 功能 
+
+觀察控制台日誌，您會看到：
+- `🚀 API START` - 請求開始日誌
+- `✓ API SUCCESS` - 請求成功日誌  
+- `📊 PERFORMANCE` - 性能監控日誌
+
+## 🔨 階段二：基於模板創建新專案 (30 分鐘)
+
+### 步驟 1：專案結構複製與重新命名
+
+```bash
+# 1. 創建新專案目錄
+cp -r spring-mvc-template my-awesome-project
+cd my-awesome-project
+
+# 2. 更新 pom.xml
+# 修改以下內容：
+# - <artifactId>spring-mvc-template</artifactId> → <artifactId>my-awesome-project</artifactId>
+# - <name>Spring MVC Template</name> → <name>My Awesome Project</name>
+```
+
+### 步驟 2：重新命名套件結構
+
+```bash
+# 1. 重新命名主要套件
+# 從 com.template 改為 com.mycompany.awesome
+mkdir -p src/main/java/com/mycompany/awesome
+cp -r src/main/java/com/template/* src/main/java/com/mycompany/awesome/
+rm -rf src/main/java/com/template
+
+# 2. 批量替換套件引用
+find . -name "*.java" -exec sed -i 's/com\.template/com.mycompany.awesome/g' {} \;
+```
+
+### 步驟 3：更新配置文件
+
+**A. application.yml**
+```yaml
+server:
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: my-awesome-project  # 更新應用名稱
+    
+logging:
+  level:
+    com.mycompany.awesome: DEBUG  # 更新套件路徑
+```
+
+**B. 更新 Application.java**
+```java
+package com.mycompany.awesome;
+
+@SpringBootApplication
+@EnableJpaAuditing
+@EnableCaching
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+### 步驟 4：驗證新專案
+
+```bash
+# 編譯新專案
+mvn clean compile
+
+# 執行測試
+mvn test
+
+# 啟動應用
+mvn spring-boot:run
+```
+
+## 🎯 階段三：實現第一個業務功能 (45 分鐘)
+
+讓我們實現一個**部門管理**功能，展示完整的開發流程：
+
+### 步驟 1：創建部門實體
+
+```java
+// src/main/java/com/mycompany/awesome/entity/Department.java
+package com.mycompany.awesome.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "departments")
+@Getter
+@Setter
+public class Department extends BaseEntity {
+    
+    @Column(nullable = false, unique = true, length = 100)
+    private String name;
+    
+    @Column(length = 500)
+    private String description;
+    
+    @Column(nullable = false)
+    private Boolean active = true;
+    
+    @Column(length = 50)
+    private String managerEmail;
+    
+    @Column
+    private Integer employeeCount = 0;
+}
+```
+
+### 步驟 2：創建資料存取層
+
+```java
+// src/main/java/com/mycompany/awesome/repository/DepartmentRepository.java
+package com.mycompany.awesome.repository;
+
+import com.mycompany.awesome.entity.Department;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface DepartmentRepository extends JpaRepository<Department, Long> {
+    
+    // 根據名稱查找
+    Optional<Department> findByName(String name);
+    
+    // 檢查名稱是否存在
+    boolean existsByName(String name);
+    
+    // 查找活躍的部門
+    List<Department> findByActiveTrue();
+    
+    // 分頁查找活躍部門
+    Page<Department> findByActiveTrue(Pageable pageable);
+    
+    // 根據名稱搜索（模糊查詢）
+    @Query("SELECT d FROM Department d WHERE d.name LIKE %:keyword% OR d.description LIKE %:keyword%")
+    Page<Department> searchDepartments(String keyword, Pageable pageable);
+    
+    // 統計活躍部門數量
+    @Query("SELECT COUNT(d) FROM Department d WHERE d.active = true")
+    Long countActiveDepartments();
+}
+```
+
+### 步驟 3：創建 DTO 類
+
+```java
+// src/main/java/com/mycompany/awesome/dto/DepartmentDto.java
+package com.mycompany.awesome.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class DepartmentDto {
+    
+    private Long id;
+    
+    @NotBlank(message = "部門名稱不能為空")
+    @Size(min = 2, max = 100, message = "部門名稱長度應在 2-100 字符之間")
+    private String name;
+    
+    @Size(max = 500, message = "部門描述不能超過 500 字符")
+    private String description;
+    
+    private Boolean active;
+    
+    @Email(message = "請提供有效的管理員 Email")
+    private String managerEmail;
+    
+    @Min(value = 0, message = "員工數量不能為負數")
+    private Integer employeeCount;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
+}
+```
+
+```java
+// src/main/java/com/mycompany/awesome/dto/CreateDepartmentRequest.java
+package com.mycompany.awesome.dto;
+
+import jakarta.validation.constraints.*;
+import lombok.Data;
+
+@Data
+public class CreateDepartmentRequest {
+    
+    @NotBlank(message = "部門名稱不能為空")
+    @Size(min = 2, max = 100, message = "部門名稱長度應在 2-100 字符之間")
+    private String name;
+    
+    @Size(max = 500, message = "部門描述不能超過 500 字符")
+    private String description;
+    
+    @Email(message = "請提供有效的管理員 Email")
+    private String managerEmail;
+    
+    @Min(value = 0, message = "員工數量不能為負數")
+    private Integer employeeCount = 0;
+}
+```
+
+### 步驟 4：創建 MapStruct 映射器
+
+```java
+// src/main/java/com/mycompany/awesome/mapper/DepartmentMapper.java
+package com.mycompany.awesome.mapper;
+
+import com.mycompany.awesome.dto.CreateDepartmentRequest;
+import com.mycompany.awesome.dto.DepartmentDto;
+import com.mycompany.awesome.entity.Department;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface DepartmentMapper {
+    
+    // Entity → DTO
+    DepartmentDto toDto(Department department);
+    
+    // DTO → Entity  
+    Department toEntity(DepartmentDto departmentDto);
+    
+    // CreateRequest → Entity
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "active", constant = "true")
+    Department toEntity(CreateDepartmentRequest request);
+    
+    // List 轉換
+    List<DepartmentDto> toDtoList(List<Department> departments);
+    
+    // 更新實體（保留不變的欄位）
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    void updateEntity(DepartmentDto dto, @MappingTarget Department entity);
+}
+```
+
+### 步驟 5：實現業務邏輯層
+
+```java
+// src/main/java/com/mycompany/awesome/service/DepartmentService.java
+package com.mycompany.awesome.service;
+
+import com.mycompany.awesome.annotation.Auditable;
+import com.mycompany.awesome.annotation.TrackPerformance;
+import com.mycompany.awesome.dto.CreateDepartmentRequest;
+import com.mycompany.awesome.dto.DepartmentDto;
+import com.mycompany.awesome.dto.PageResponse;
+import com.mycompany.awesome.entity.Department;
+import com.mycompany.awesome.exception.BusinessException;
+import com.mycompany.awesome.exception.ResourceNotFoundException;
+import com.mycompany.awesome.mapper.DepartmentMapper;
+import com.mycompany.awesome.repository.DepartmentRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class DepartmentService {
+    
+    private final DepartmentRepository departmentRepository;
+    private final DepartmentMapper departmentMapper;
+    
+    // 創建部門
+    @Transactional
+    @Auditable(action = "CREATE_DEPARTMENT", resourceType = "Department")
+    public DepartmentDto createDepartment(CreateDepartmentRequest request) {
+        log.info("創建新部門：{}", request.getName());
+        
+        // 檢查部門名稱是否已存在
+        if (departmentRepository.existsByName(request.getName())) {
+            throw new BusinessException("部門名稱已存在：" + request.getName());
+        }
+        
+        Department department = departmentMapper.toEntity(request);
+        Department savedDepartment = departmentRepository.save(department);
+        
+        log.info("部門創建成功，ID：{}", savedDepartment.getId());
+        return departmentMapper.toDto(savedDepartment);
+    }
+    
+    // 根據 ID 查找部門（使用緩存）
+    @Cacheable(value = "departments", key = "#id")
+    @TrackPerformance
+    public DepartmentDto getDepartmentById(Long id) {
+        log.debug("查找部門 ID：{}", id);
+        
+        Department department = departmentRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Department", id));
+        
+        return departmentMapper.toDto(department);
+    }
+    
+    // 查找所有活躍部門
+    @Cacheable(value = "activeDepartments")
+    public List<DepartmentDto> getActiveDepartments() {
+        log.debug("查找所有活躍部門");
+        
+        List<Department> departments = departmentRepository.findByActiveTrue();
+        return departmentMapper.toDtoList(departments);
+    }
+    
+    // 分頁查詢部門
+    @TrackPerformance(warnThreshold = 1000)
+    public PageResponse<DepartmentDto> getAllDepartments(Pageable pageable) {
+        log.debug("分頁查詢部門：{}", pageable);
+        
+        Page<Department> departmentPage = departmentRepository.findAll(pageable);
+        List<DepartmentDto> dtoList = departmentMapper.toDtoList(departmentPage.getContent());
+        
+        return PageResponse.<DepartmentDto>builder()
+                .content(dtoList)
+                .pageNumber(departmentPage.getNumber())
+                .pageSize(departmentPage.getSize())
+                .totalElements(departmentPage.getTotalElements())
+                .totalPages(departmentPage.getTotalPages())
+                .first(departmentPage.isFirst())
+                .last(departmentPage.isLast())
+                .hasNext(departmentPage.hasNext())
+                .hasPrevious(departmentPage.hasPrevious())
+                .build();
+    }
+    
+    // 更多方法... (請參考完整專案程式碼)
+}
+```
+
+### 步驟 6：創建控制器層
+
+```java
+// src/main/java/com/mycompany/awesome/controller/DepartmentController.java
+package com.mycompany.awesome.controller;
+
+import com.mycompany.awesome.dto.*;
+import com.mycompany.awesome.service.DepartmentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@Slf4j
+@RestController
+@RequestMapping("/departments")
+@RequiredArgsConstructor
+@Tag(name = "Department Management", description = "部門管理 API")
+public class DepartmentController {
+    
+    private final DepartmentService departmentService;
+    
+    @PostMapping
+    @Operation(summary = "創建部門", description = "創建新的部門")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "部門創建成功"),
+        @ApiResponse(responseCode = "400", description = "請求參數無效"),
+        @ApiResponse(responseCode = "409", description = "部門名稱已存在")
+    })
+    public ResponseEntity<com.mycompany.awesome.dto.ApiResponse<DepartmentDto>> createDepartment(
+            @Valid @RequestBody CreateDepartmentRequest request) {
+        
+        log.info("創建部門請求：{}", request.getName());
+        DepartmentDto createdDepartment = departmentService.createDepartment(request);
+        
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(com.mycompany.awesome.dto.ApiResponse.success("部門創建成功", createdDepartment));
+    }
+    
+    @GetMapping("/{id}")
+    @Operation(summary = "根據 ID 查找部門")
+    public ResponseEntity<com.mycompany.awesome.dto.ApiResponse<DepartmentDto>> getDepartmentById(
+            @PathVariable Long id) {
+        
+        DepartmentDto department = departmentService.getDepartmentById(id);
+        return ResponseEntity.ok(com.mycompany.awesome.dto.ApiResponse.success(department));
+    }
+    
+    // 更多端點... (請參考完整專案程式碼)
+}
+```
+
+### 步驟 7：測試新功能
+
+```bash
+# 1. 重新啟動應用
+mvn spring-boot:run
+
+# 2. 創建部門
+curl -X POST http://localhost:8080/api/departments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "技術部",
+    "description": "負責公司技術研發工作",
+    "managerEmail": "tech@company.com",
+    "employeeCount": 15
+  }'
+
+# 3. 查詢部門
+curl http://localhost:8080/api/departments/1
+
+# 4. 獲取活躍部門列表
+curl http://localhost:8080/api/departments/active
+
+# 5. 分頁查詢
+curl "http://localhost:8080/api/departments?page=0&size=5"
+
+# 6. 搜索部門
+curl "http://localhost:8080/api/departments/search?keyword=技術"
+
+# 7. 查看統計
+curl http://localhost:8080/api/departments/statistics
+```
+
+## 🎓 階段四：進階主題與生產部署 (30 分鐘)
+
+### 步驟 1：配置生產環境
+
+**A. 創建生產配置文件 - application-prod.yml**
+```yaml
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/myawesome_db
+    username: ${DB_USERNAME:myawesome_user}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      
+  jpa:
+    hibernate:
+      ddl-auto: validate  # 生產環境只驗證，不自動創建
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD}
+    timeout: 2000ms
+
+logging:
+  level:
+    root: INFO
+    com.mycompany.awesome: INFO
+  file:
+    name: logs/application.log
+```
+
+**B. Docker 容器化部署**
+
+創建 Dockerfile：
+```dockerfile
+# Dockerfile
+FROM openjdk:21-jdk-slim
+
+# 設置工作目錄
+WORKDIR /app
+
+# 複製 JAR 文件
+COPY target/my-awesome-project-1.0.0-SNAPSHOT.jar app.jar
+
+# 設置 JVM 參數
+ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC"
+
+# 暴露端口
+EXPOSE 8080
+
+# 健康檢查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/api/actuator/health || exit 1
+
+# 啟動應用
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+```
+
+創建 docker-compose.yml：
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_USERNAME=myawesome_user
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=myawesome_db
+      - POSTGRES_USER=myawesome_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+### 步驟 2：CI/CD 部署流程
+
+創建 `.github/workflows/deploy.yml`：
+```yaml
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        
+    - name: Run tests
+      run: mvn clean test
+      
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+      
+    - name: Build Docker image
+      run: |
+        docker build -t myawesome-app:${{ github.sha }} .
+        docker tag myawesome-app:${{ github.sha }} myawesome-app:latest
+```
+
+## 🏆 完成效果驗證
+
+完成所有步驟後，您將擁有：
+
+1. **生產就緒的應用** - 具備企業級配置和安全性
+2. **完整的部門管理系統** - CRUD、搜索、分頁、統計功能
+3. **監控和日誌** - 結構化日誌、性能指標、健康檢查
+4. **容器化部署** - Docker + Docker Compose 支持
+5. **CI/CD 流程** - 自動化測試和部署
+6. **AOP 功能體驗** - 審計日誌、性能監控實際運行
+
+## 📈 進階學習建議
+
+1. **微服務拆分** - 學習如何將單體應用拆分為微服務
+2. **分布式追蹤** - 集成 Zipkin 或 Jaeger
+3. **事件驅動架構** - 使用 Spring Cloud Stream
+4. **API 網關** - 集成 Spring Cloud Gateway
+5. **服務發現** - 使用 Consul 或 Eureka
+
+## 💡 最佳實踐提醒
+
+1. **遵循分層架構** - 各層職責分明
+2. **使用統一異常處理** - 提供一致的錯誤回應
+3. **實施緩存策略** - 提升查詢性能
+4. **編寫完整測試** - 單元測試 + 整合測試
+5. **使用 DTO 模式** - 避免直接暴露實體
+6. **記錄關鍵日誌** - 便於問題排查
+
+---
+
+**🎉 恭喜！您已經掌握了企業級 Spring Boot 開發的核心技能！**
+
+現在您可以基於這個模板快速構建生產就緒的企業級應用程式。

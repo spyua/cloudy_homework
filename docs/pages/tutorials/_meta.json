@@ -1,0 +1,19 @@
+{
+  "index": "教學總覽",
+  "template": {
+    "title": "🔥 Template 完整教學",
+    "theme": {
+      "sidebar": true,
+      "toc": true,
+      "pagination": true
+    }
+  },
+  "example": {
+    "title": "💼 Example 實戰指南", 
+    "theme": {
+      "sidebar": true,
+      "toc": true,
+      "pagination": true
+    }
+  }
+}

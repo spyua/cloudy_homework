@@ -1,0 +1,89 @@
+/* Nextra 自定義樣式 */
+
+.footer-content {
+  text-align: center;
+}
+
+.footer-links {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-links a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.separator {
+  opacity: 0.5;
+}
+
+.sidebar-separator {
+  font-weight: 600;
+  color: var(--nextra-primary-hue);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--nextra-border-color);
+  margin-bottom: 8px;
+}
+
+/* 代碼塊樣式增強 */
+pre {
+  border-radius: 8px;
+  border: 1px solid var(--nextra-border-color);
+}
+
+/* 響應式設計增強 */
+@media (max-width: 768px) {
+  .footer-links {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .separator {
+    display: none;
+  }
+}
+
+/* 暗黑模式優化 */
+[data-theme="dark"] .sidebar-separator {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 首頁卡片樣式 */
+.nextra-cards {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* 搜索框樣式 */
+.nextra-search input {
+  border-radius: 8px;
+}
+
+/* 目錄樣式 */
+.nextra-toc {
+  border-left: 2px solid var(--nextra-primary-color);
+  padding-left: 1rem;
+}
+
+/* 代碼高亮主題優化 */
+.nextra-code-block {
+  margin: 1rem 0;
+}
+
+/* 標題錨點樣式 */
+.nextra-heading-anchor {
+  color: var(--nextra-primary-color);
+  opacity: 0.8;
+}
+
+.nextra-heading-anchor:hover {
+  opacity: 1;
+}

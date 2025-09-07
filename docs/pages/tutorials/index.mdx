@@ -1,0 +1,155 @@
+---
+title: 教學指南總覽
+description: Spring Boot 資源庫的完整學習路徑和教學指南
+---
+
+import { Cards, Card, Callout } from 'nextra/components'
+import { AcademicCapIcon, CodeBracketIcon, RocketLaunchIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+
+# 📚 Spring Boot 資源庫教學指南
+
+歡迎來到 Spring Boot 資源庫的完整教學指南！本指南提供從初學者到進階開發者的完整學習路徑。
+
+## 🎯 教學目標
+
+幫助您：
+1. **理解現代企業級 Spring Boot 架構**
+2. **快速上手模板和範例專案**
+3. **掌握最佳實踐和設計模式**
+4. **實現生產就緒的應用程式**
+
+## 📖 教學內容
+
+<Cards>
+  <Card 
+    icon={<RocketLaunchIcon />} 
+    title="🔥 Spring MVC Template 完整上手教學" 
+    href="/tutorials/template"
+  >
+    **學習時間**: 約 2 小時  
+    **適合對象**: 想要學習企業級 Spring Boot 開發的開發者
+    
+    - 🔍 **模板探索** (20 分鐘)
+    - 🔨 **創建新專案** (30 分鐘) 
+    - 🎯 **業務功能實現** (45 分鐘)
+    - 🎓 **生產部署** (30 分鐘)
+  </Card>
+  
+  <Card 
+    icon={<CodeBracketIcon />} 
+    title="💼 Spring MVC Example 實戰指南" 
+    href="/tutorials/example"
+  >
+    **學習時間**: 約 1 小時  
+    **適合對象**: 希望理解完整業務實現的開發者
+    
+    - 🏗️ 用戶管理系統深度解析
+    - 🔄 完整的 CRUD 操作實現
+    - 🔍 高級搜索和分頁功能
+    - 💾 快取和效能優化策略
+  </Card>
+</Cards>
+
+## 🎓 學習路徑建議
+
+### 📚 **初學者路徑**
+
+<Callout type="info" emoji="🎯">
+**推薦學習時間**: 3-4 小時
+</Callout>
+
+1. 先閱讀 [架構設計指南](/architecture) 了解整體設計
+2. 跟隨 [Template 教學](/tutorials/template) 動手實踐  
+3. 參考 [Example 教學](/tutorials/example) 深入理解
+
+### 🚀 **進階開發者路徑**
+
+<Callout type="warning" emoji="⚡">
+**快速上手**: 2-3 小時
+</Callout>
+
+1. 直接從 [Template 教學](/tutorials/template) 開始
+2. 深入研讀 [技術棧文檔](/architecture/tech-stack)
+3. 實施生產環境部署和監控
+
+### 👨‍💼 **團隊負責人路徑** 
+
+<Callout type="default" emoji="💼">
+**評估導向**: 1-2 小時
+</Callout>
+
+1. 閱讀 [專案總結](/guides/summary) 了解整體價值
+2. 評估 [架構設計](/architecture/design) 的適用性
+3. 制定基於模板的團隊開發標準
+
+## 🛠️ 快速開始
+
+### 1. 環境準備
+```bash
+# 確保環境需求
+java --version    # Java 21+
+mvn --version     # Maven 3.6+
+```
+
+### 2. 克隆專案
+```bash
+git clone https://github.com/username/cloudy_homework.git
+cd cloudy_homework
+```
+
+### 3. 選擇學習方向
+```bash
+# 模板學習
+cd projects/spring-mvc-template && mvn spring-boot:run
+
+# 範例學習  
+cd projects/spring-mvc-example && mvn spring-boot:run
+```
+
+### 4. 訪問應用
+- **API 文檔**: http://localhost:8080/api/swagger-ui.html
+- **健康檢查**: http://localhost:8080/api/actuator/health
+- **H2 控制台**: http://localhost:8080/api/h2-console
+
+## 📚 相關資源
+
+### 📖 **官方文檔**
+- [Spring Boot 官方文檔](https://spring.io/projects/spring-boot)
+- [Spring Security 參考指南](https://spring.io/projects/spring-security)  
+- [Spring Data JPA 文檔](https://spring.io/projects/spring-data-jpa)
+
+### 🎥 **推薦學習資源**
+- [Spring Boot 最佳實踐](https://spring.io/guides)
+- [微服務架構指南](https://microservices.io/)
+- [RESTful API 設計指南](https://restfulapi.net/)
+
+## 💡 學習建議
+
+### ✅ **最佳實踐**
+1. **動手實踐** - 每個教學都包含可執行的程式碼
+2. **理解原理** - 不只是複製貼上，要理解設計理念  
+3. **循序漸進** - 按照建議的學習路徑進行
+4. **實際應用** - 嘗試將學到的知識應用到自己的專案
+
+### ⚠️ **注意事項**
+- 確保 Java 21+ 和 Maven 3.6+ 環境
+- 推薦使用 IDE (IntelliJ IDEA 或 VS Code)
+- 每個步驟都有對應的測試命令，建議實際執行
+
+## 🤝 貢獻與反饋
+
+### 📝 **如何貢獻**  
+1. 發現教學內容問題請提交 [Issue](https://github.com/username/cloudy_homework/issues)
+2. 改進建議歡迎提交 [Pull Request](https://github.com/username/cloudy_homework/pulls)
+3. 分享您的學習心得和最佳實踐
+
+### 📞 **獲取幫助**
+1. 查看 [FAQ](/guides/faq) 常見問題
+2. 搜索現有 [Issues](https://github.com/username/cloudy_homework/issues)  
+3. 提交新的 [Issue](https://github.com/username/cloudy_homework/issues/new) 描述問題
+
+---
+
+**🎯 開始您的 Spring Boot 企業級開發之旅！**
+
+選擇適合的教學路徑，開始學習現代化的 Java 企業應用開發。

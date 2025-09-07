@@ -1,0 +1,241 @@
+---
+layout: default
+title: "範例專案"
+nav_order: 4
+has_children: true
+---
+
+# 💼 範例專案展示
+
+## 概覽
+
+本節展示基於 Spring MVC Template 構建的完整範例專案，包含實際業務場景的完整實現。
+
+## 🎯 範例專案列表
+
+### [用戶管理系統](user-management/)
+**專案路徑**: `projects/spring-mvc-example/`
+
+完整的用戶管理系統實現，展示：
+- ✅ 用戶 CRUD 操作
+- ✅ 高級搜索和過濾
+- ✅ 分頁支持  
+- ✅ 資料驗證
+- ✅ 統一異常處理
+- ✅ API 文檔
+- ✅ 緩存實現
+- ✅ 完整測試覆蓋
+
+[查看詳細實現 →](user-management/)
+
+### [部門管理系統](department-management/) *(規劃中)*
+展示部門與用戶的一對多關係管理
+
+### [項目管理系統](project-management/) *(規劃中)*
+展示複雜業務邏輯和工作流程管理
+
+## 🏗️ 範例架構特點
+
+### 1. 分層架構
+```
+Controller Layer    → 處理 HTTP 請求，資料驗證
+    ↓
+Service Layer      → 業務邏輯，事務管理  
+    ↓
+Repository Layer   → 資料存取，JPA 查詢
+    ↓
+Database Layer     → H2/MySQL 資料庫
+```
+
+### 2. 設計模式應用
+- **依賴注入 (DI)**: Spring IoC 容器管理
+- **策略模式**: 不同搜索和過濾策略  
+- **建造者模式**: RestResponse 靜態工廠方法
+- **模板方法**: BaseEntity 通用欄位
+- **代理模式**: AOP 切面實現
+
+### 3. 企業級特性
+- **統一異常處理**: @RestControllerAdvice 全局處理
+- **AOP 橫切關注點**: 日誌、審計、性能監控
+- **快取抽象**: @Cacheable, @CacheEvict 註解
+- **資料驗證**: JSR-303 Bean Validation
+- **API 文檔**: OpenAPI 3 自動生成
+
+## 🔧 技術棧展示
+
+### 核心框架
+- **Java 21** - 最新 LTS 版本特性
+- **Spring Boot 3.2** - 現代化企業框架
+- **Spring Security 6** - 最新安全機制
+- **Spring Data JPA** - 資料存取抽象
+
+### 工具集成
+- **MapStruct 1.5.5** - 物件映射自動生成
+- **SpringDoc OpenAPI 3** - API 文檔自動生成
+- **Lombok** - 程式碼簡化
+- **Redis** - 分散式快取
+
+### 開發工具
+- **H2 Database** - 內嵌開發資料庫
+- **MySQL** - 生產環境資料庫
+- **Maven** - 依賴管理和建構工具
+- **Docker** - 容器化部署
+
+## 📊 功能展示
+
+### 1. RESTful API 設計
+```http
+GET    /api/users              # 查詢用戶列表 (分頁)
+POST   /api/users              # 創建用戶
+GET    /api/users/{id}         # 根據 ID 查詢用戶
+PUT    /api/users/{id}         # 更新用戶
+DELETE /api/users/{id}         # 刪除用戶
+GET    /api/users/search       # 搜索用戶
+```
+
+### 2. 統一回應格式
+```json
+{
+  "success": true,
+  "message": "操作成功",
+  "data": { /* 實際資料 */ },
+  "timestamp": "2024-01-01T10:00:00"
+}
+```
+
+### 3. 資料驗證
+```java
+@NotBlank(message = "Username is required")
+@Size(min = 3, max = 50)
+private String username;
+
+@Email(message = "Please provide a valid email address")
+private String email;
+```
+
+### 4. 快取支持
+```java
+@Cacheable(value = "users", key = "#id")
+public UserDto getUserById(Long id) { ... }
+
+@CacheEvict(value = "users", allEntries = true)
+public UserDto createUser(CreateUserRequest request) { ... }
+```
+
+## 🧪 測試展示
+
+### 單元測試
+```java
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+    
+    @Mock
+    private UserRepository userRepository;
+    
+    @InjectMocks
+    private UserService userService;
+    
+    @Test
+    void shouldCreateUser() {
+        // Given
+        CreateUserRequest request = CreateUserRequest.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .build();
+        
+        // When & Then
+        assertThat(userService.createUser(request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("username", "testuser");
+    }
+}
+```
+
+### 整合測試
+```java
+@SpringBootTest
+@TestMethodOrder(OrderAnnotation.class)
+class UserControllerIntegrationTest {
+    
+    @Autowired
+    private TestRestTemplate restTemplate;
+    
+    @Test
+    void shouldCreateAndRetrieveUser() {
+        // 完整的 API 測試流程
+    }
+}
+```
+
+## 🚀 快速體驗
+
+### 1. 啟動專案
+```bash
+cd projects/spring-mvc-example
+mvn spring-boot:run
+```
+
+### 2. 訪問服務
+- **API 文檔**: http://localhost:8080/api/swagger-ui.html
+- **健康檢查**: http://localhost:8080/api/actuator/health
+- **H2 控制台**: http://localhost:8080/api/h2-console
+
+### 3. API 測試
+```bash
+# 創建用戶
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "demo_user",
+    "email": "demo@example.com",
+    "firstName": "Demo",
+    "lastName": "User"
+  }'
+
+# 查詢用戶
+curl http://localhost:8080/api/users/1
+```
+
+## 📈 效能特性
+
+### 1. 查詢效能
+- 資料庫索引優化
+- 分頁查詢支持
+- N+1 查詢問題避免
+- 快取機制加速
+
+### 2. 併發處理
+- Spring Boot 內建 Tomcat
+- 連線池配置優化
+- 異步處理支持
+- 線程安全設計
+
+### 3. 記憶體管理
+- JPA 實體生命週期管理
+- 快取過期策略
+- 資源自動釋放
+- GC 優化配置
+
+## 🔒 安全特性
+
+### 1. 輸入驗證
+- Bean Validation 註解
+- 自定義驗證器
+- SQL 注入防護
+- XSS 攻擊防護
+
+### 2. 異常處理
+- 敏感資訊隱藏
+- 錯誤碼標準化
+- 日誌記錄完整
+- 回滾機制
+
+### 3. API 安全
+- CORS 配置
+- HTTPS 支持
+- 請求頭驗證
+- 速率限制 (可選)
+
+---
+
+探索這些範例專案，了解如何將理論知識應用到實際的業務場景中！
