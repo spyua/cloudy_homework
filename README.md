@@ -2,6 +2,9 @@
 
 這個資源庫包含了現代 Spring Boot 開發的完整資源，包括可重複使用的模板、實際範例和詳細的架構指南。
 
+## 📚 完整文檔網站
+> 🌟 **全新體驗**: [訪問 GitHub Pages 文檔網站](https://username.github.io/cloudy_homework/) 獲得更好的閱讀體驗
+
 ## 📁 專案結構
 
 ```
@@ -9,9 +12,10 @@
 ├── 📂 projects/                    # 🚀 可執行專案
 │   ├── 📦 spring-mvc-template/     # 📋 Spring MVC 模板專案
 │   └── 📦 spring-mvc-example/      # 🎯 用戶管理系統範例
-├── 📂 docs/                       # 📚 技術文檔
+├── 📂 docs/                       # 📚 完整技術文檔 (GitHub Pages)
+│   ├── 📂 tutorials/              # 🎓 完整教學指南
 │   ├── 📂 architecture/           # 🏛️ 架構設計文檔
-│   └── 📂 guides/                 # 📖 開發指南
+│   └── 📂 examples/               # 💼 範例展示
 ├── 📂 legacy/                     # 🗃️ 歷史專案
 │   └── 📂 cloudy-homework-original/ # 原始 cloudy homework 專案
 └── 📄 README.md                   # 📋 專案總覽 (此文件)
@@ -63,7 +67,12 @@ mvn spring-boot:run
 - DTO 映射最佳實踐
 - 業務邏輯組織方式
 
-## 📚 技術文檔
+## 📚 學習資源
+
+### 🎓 完整教學指南 *(推薦從這裡開始)*
+- 🔥 [**Spring MVC Template 完整上手教學**](./docs/tutorials/spring-mvc-template-tutorial.md) - 從模板探索到生產部署的完整 125 分鐘教學
+- 💼 [**Spring MVC Example 實戰指南**](./docs/tutorials/spring-mvc-example-tutorial.md) - 用戶管理系統深度解析和最佳實踐
+- 📖 [**教學總覽**](./docs/tutorials/README.md) - 不同學習路徑和建議
 
 ### 🏛️ 架構設計
 - [**整體架構設計**](./docs/architecture/ARCHITECTURE_DESIGN.md) - 微服務架構與現代設計理念
@@ -71,26 +80,30 @@ mvn spring-boot:run
 - [**模組結構規劃**](./docs/architecture/MODULE_STRUCTURE.md) - 清晰的服務邊界設計
 - [**開發環境建置**](./docs/architecture/DEVELOPMENT_ENVIRONMENT.md) - 完整的開發工具鏈
 
+### 💼 範例展示
+- [**用戶管理系統**](./docs/examples/user-management.md) - 完整業務實現展示
+- [**設計模式應用**](./docs/examples/design-patterns.md) - 企業級設計模式實踐
+
 ### 📖 開發指南
 - [**專案總結**](./docs/guides/PROJECT_SUMMARY.md) - 重構分析與架構對比
 - [**Spring MVC 專案指南**](./docs/guides/SPRING_MVC_PROJECT_SUMMARY.md) - 模板使用與最佳實踐
 
 ## 🎯 使用建議
 
-### 對於新專案開發者
-1. **快速開始**: 複製 `projects/spring-mvc-template` 作為新專案基礎
-2. **學習範例**: 參考 `projects/spring-mvc-example` 了解具體實現
-3. **架構參考**: 閱讀 `docs/architecture/` 了解設計理念
+### 📚 初學者路徑
+1. **開始學習**: 先閱讀 [教學總覽](./docs/tutorials/README.md) 了解整體架構
+2. **動手實踐**: 跟隨 [Template 完整教學](./docs/tutorials/spring-mvc-template-tutorial.md) 逐步實作
+3. **深入理解**: 參考 [Example 實戰指南](./docs/tutorials/spring-mvc-example-tutorial.md) 學習業務實現
 
-### 對於學習者
-1. **理解架構**: 從 `docs/architecture/ARCHITECTURE_DESIGN.md` 開始
-2. **動手實踐**: 運行兩個專案，體驗差異
-3. **深入研究**: 比較模板與範例的代碼差異
+### 🚀 進階開發者路徑  
+1. **快速上手**: 直接從 [Template 教學](./docs/tutorials/spring-mvc-template-tutorial.md) 開始
+2. **技術深入**: 研讀 [技術棧文檔](./docs/architecture/TECH_STACK.md)
+3. **生產實施**: 實施生產環境部署和監控
 
-### 對於團隊負責人
-1. **技術選型**: 參考 `docs/architecture/TECH_STACK.md`
-2. **架構決策**: 參考 `docs/guides/PROJECT_SUMMARY.md` 的對比分析
-3. **開發規範**: 基於模板建立團隊開發標準
+### 👨‍💼 團隊負責人路徑
+1. **項目評估**: 閱讀 [專案總結](./docs/guides/PROJECT_SUMMARY.md) 了解整體價值  
+2. **架構決策**: 評估 [架構設計](./docs/architecture/ARCHITECTURE_DESIGN.md) 的適用性
+3. **團隊標準**: 制定基於模板的團隊開發標準
 
 ## 🛠️ 核心技術特點
 
